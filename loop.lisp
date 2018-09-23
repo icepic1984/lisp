@@ -1,23 +1,28 @@
-(defparameter file (pathname "/home/icepic/dump/test.lisp"))
+(use-package :cl-ppcre)
 
-(defun match (line)
-  (when (< 5 (random 10))line))
+(defparameter *file* (pathname "/home/icepic/Code/lisp/test.xml"))
 
-(with-open-file (stream file)
-  (loop
-     for line = (read-line stream nil) while line
-     for matched = (apply-until #'match line) when matched collect matched))
+(defparameter *refxy* (create-scanner ".*?ReferenzXY value = \"([0-9,]+)\".*"))
+(defparameter *refz* (create-scanner ".*?ReferenzZ value = \"([0-9,]+)\".*"))
+(defparameter *refMesh* (create-scanner ".*?ReferenzMesh value = \"([0-9,]+)\".*"))
 
-(defun match-line (reg)
-    (when (= 10 reg ) reg))
 
-(defun apply-until (pred list)
-  (loop for item in list thereis (funcall pred item)))
+(defun match-regexp (line regexp)
+  (register-groups-bind (value)
+      (regexp line :sharedp t ) value))
 
-(defun test3 ( &rest bla)
-  (apply-until #'match-line bla))
+(defun apply-on-line-until (func line regexps)
+  (loop for regex in regexps thereis (funcall func line regex)))
 
-(test3 20 30 40 10)
+(defun retrieve-values-from-file (file &rest regexp)
+  (with-open-file (stream file)
+    (loop
+       for line = (read-line stream nil) while line
+       for matched = (apply-on-line-until #'match-regexp line regexp)
+       when matched collect it)))
+
+(retrieve-values-from-file *file* *refxy* *refz* *refmesh*)
+
 
 
 
