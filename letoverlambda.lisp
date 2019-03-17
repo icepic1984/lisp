@@ -50,7 +50,6 @@
      (fact r)))
 
 
-
 ;; Lexcial scoping vs dynamic scoping
 ;; Dynamic scoping
 (defvar temp-special)
@@ -110,3 +109,102 @@
 
 
 ;; See lol 41
+(defun sleep-units% (value unit)
+  (sleep
+   (* value
+      (case unit
+        ((s) 1)
+        ((m) 60)
+        ((h) 3600)
+        ((d) 86400)
+        ((ms) 1/1000)
+        ((us) 1/1000000)))))
+
+(sleep-units% 10 's)
+
+(defmacro sleep-units (value unit)
+  `(sleep
+    (* , value
+         ,(case unit
+            ((s) 1)
+            ((m) 60)
+            ((h) 3600)
+            ((d) 86400)
+            ((ms) 1/1000)
+            ((us) 1/1000000)))))
+
+(sleep-units 10 s)
+
+(defmacro unit-of-time (value unit)
+  `(* , value
+       ,(case unit
+          ((s) 1)
+          ((m) 60)
+          ((h) 3600)
+          ((d) 86400)
+          ((ms) 1/1000)
+          ((us) 1/1000000))))
+
+;; See lol 45
+;; Macro which let us use named let from scheme
+(mapcar #'car '((a b c) (d e f)))
+(mapcar #'cadr '((a b c) (d e f)))
+
+(defmacro nlet (n letargs &rest body)
+  `(labels ((,n ,(mapcar #'car letargs)
+              ,@body))
+     (,n ,@ (mapcar #'cadr letargs))))
+
+(defun nlet-fac (n)
+  (nlet fact ((n n))
+        (if (zerop n)
+            1
+            (* n (fact (- n 1))))))
+
+(macroexpand  '(nlet fact ((n n))
+                    (if (zerop n)
+                        1
+                        (* n (fact (- n 1))))))
+
+
+;; See lol 57
+(defmacro nif% (expr pos zero neg)
+  (let ((g (gensym)))
+    `(let ((,g ,expr))
+       (cond ((plusp ,g), pos)
+             ((zerop ,g), zero)
+             (t, neg)))))
+
+(nif% (+ 1 -10) 'pos 'zero 'neg)
+
+;; See lol 59
+;; Test if symbol is a gensym symbol (start with G!)
+(defun g!-symbol-p (s)
+  (print s)
+  (and (symbolp s)
+       (> (length (symbol-name s)) 2)
+       (string= (symbol-name s) "G!" :start1 0 :end1 2 )))
+
+;; See lol 60
+(defmacro defmacro/g! (name args &rest body)
+  (let ((syms (remove-duplicates
+               (remove-if-not #'g!-symbol-p (flatten body)))))
+    `(defmacro ,name ,args
+       (let ,(mapcar
+              (lambda (s)
+                `(,s (gensym ,(subseq (symbol-name s)
+                                      2))))
+              syms)
+         ,@body))))
+
+;; Example
+(defmacro/g! nif (expr pos zero neg)
+  `(let ((,g!result ,expr))
+     (cond ((plusp ,g!result), pos)
+           ((zerop ,g!result), zero)
+           (t ,neg))))
+
+(nif (+ -1 10) 'pos 'zero 'neg)
+
+(g!-symbol-p ',g!-b)
+(remove #\, ",GResul")
