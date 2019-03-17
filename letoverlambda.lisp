@@ -87,3 +87,26 @@
 (funcall scanner "we will start")
 (funcall scanner "the ji")
 (funcall scanner "had tomorrow.")
+
+;; See lol 36
+;; let over lambdas as objects with static data
+(let ((direction 'up))
+  (defun toggle-counter-direction ()
+    (setq direction
+          (if (eq direction 'up)
+              'down
+              'up)))
+
+  (defun counter-class ()
+    (let ((counter 0))
+      (lambda ()
+        (if (eq direction 'up)
+            (incf counter)
+            (decf counter))))))
+
+(defvar counter (counter-class))
+(funcall counter)
+(toggle-counter-direction)
+
+
+;; See lol 41
