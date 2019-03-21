@@ -14,17 +14,18 @@
   (if *running* (setq *running* nil)
       (setq *running*  t)))
 
-(let ((counter 0))
-  (loop while *running* do
-       (when (> 100000 counter)
-         (print "Running")
-         (setq counter 0)
-         (print counter))
-       (update-swank)
-       (sleep 1/10)
-       (incf counter)))
+(defun rundemo ()
+    (let ((counter 0))
+      (loop while *running* do
+           (when (> 100000 counter)
+             (setq counter 0)
+             (print counter))
+           (update-swank)
+           (sleep 1/10)
+           (incf counter))))
 
 (toggle-running)
+
 
 
 
