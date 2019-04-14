@@ -72,7 +72,7 @@
 (defun tweak-test (lst caps lit)
   (when lst
     (let ((item (car lst))
-          (rest (cdr lst)))ppp
+          (rest (cdr lst)))
       (cond ((eq item #\space) (cons item (tweak-test rest caps lit)))
             ((member item '(#\? #\! #\.)) (cons item (tweak-test rest t lit)))
             ((eq item #\") (tweak-test rest caps (not lit)))
