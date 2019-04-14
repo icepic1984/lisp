@@ -209,7 +209,7 @@
 (g!-symbol-p ',g!-b)
 (remove #\, ",GResul")
 
-;; See lol 67
+;; See lol 67: Only once
 (defun o!-symbol-p (s)
   (and (symbolp s)
        (> (length (symbol-name s)) 2)
@@ -217,3 +217,28 @@
 
 (defun o!-symbol-to-g!-symbol (s)
   (symb "G!" (subseq (symbol-name s) 2)))
+
+(defmacro defmacro! (name args &rest body)
+  (let* ((os (remove-if-not #'o!-symbol-p args))
+         (gs (mapcar #'o!-symbol-to-g!-symbol os)))
+    `(defmacro/g! ,name ,args
+       `(let ,(mapcar #'list (list ,@gs) (list ,@os))
+          ,(progn ,@body)))))
+
+(defmacro broken-square (x)
+  `(* ,x ,x))
+
+(let ((x 2))
+  (equal 9 (broken-square (incf x)))) ; Returns 12
+
+(defmacro! fix-square (o!x)
+  `(* ,g!x ,g!x))
+
+(let ((x 2))
+  (equal 9 (fix-square (incf x))))
+
+
+(fix-square 10)
+
+
+
