@@ -103,7 +103,22 @@
 (defun factory (obj)
   (make-instance obj :value 100))
 
+
+(defparameter *output* "output")
+
+(defgeneric rebind (obj))
+
+(defmethod rebind :around ((obj a))
+  (let ((*output* "new output"))
+    (call-next-method)))
+
+(defmethod rebind ((obj a))
+  (format t "~a~%" *output*))
+
+
 (progn
   (format t "~%")
-  (test-2 (factory 'c)))
+  (test-2 (factory 'c))
+  (format t "~%")
+  (rebind (factory 'a)))
 
