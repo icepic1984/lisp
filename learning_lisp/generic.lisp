@@ -100,10 +100,6 @@
   (format t "Around B~%")
   (call-next-method))
 
-(defun factory (obj)
-  (make-instance obj :value 100))
-
-
 (defparameter *output* "output")
 
 (defgeneric rebind (obj))
@@ -115,10 +111,29 @@
 (defmethod rebind ((obj a))
   (format t "~a~%" *output*))
 
+(defgeneric priority (obj)
+  (:method-combination +))
+
+(defmethod priority + ((obj a))
+  (value obj))
+
+(defmethod priority + ((obj b))
+  (value obj)
+  (call-next-method))
+
+(defun factory (obj)
+  (make-instance obj :value 100))
 
 (progn
   (format t "~%")
   (test-2 (factory 'c))
   (format t "~%")
-  (rebind (factory 'a)))
+  (rebind (factory 'a))
+  (format t "~%")
+  (priority (factory 'b)))
+
+
+(find-method #'test-2 () (list (find-class 'a)))
+
+
 
