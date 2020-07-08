@@ -225,10 +225,84 @@
 (define (set? lat)
   (cond
    ((null? lat) #t)
+   ((member? (car lat) (cdr lat)) #f)
+   (else (set? (cdr lat)))))
+
+(define (makeset lat)
+  (cond
+   ((null? lat) '())
+   ((member? (car lat) (cdr lat))
+    (makeset (cdr lat)))
+   (else (cons (car lat) (makeset (cdr lat))))))
+
+(define (subset? set1 set2)
+  (cond
+   ((null? set1) #t)
+   ((member? (car set1) set2) (subset? (cdr set1) set2))
+   (else #f)))
+
+(define (eqset? set1 set2)
+  ((and (subset? set1 set2)
+        (subset? set2 set1))))
+
+(define (intersect? set1 set2)
+  (cond
+   ((null? set1) #f)
+   ((member? (car set1) set2) #t)
+   (else (intersect? (cdr set1) set2))))
+
+(define (intersect set1 set2)
+  (cond
+   ((null? set1) '())
+   ((member? (car set1) set2)
+    (cons (car set1) (intersect (cdr set1) set2)))
    (else
-    (cond
-     ((member? (car lat) (cdr lat)) #f)
-     (else (set? (cdr lat)))))))
+    (intersect (cdr set1) set2))))
+
+(define (union set1 set2)
+  (cond
+   ((null? set1) set2)
+   ((member? (car set1) set2)
+    (union (cdr set1) set2))
+   (else
+    (cons (car set1) (union (cdr set1) set2)))))
+
+(define (intersectall l)
+  (cond
+   ((null? (cdr l)) (car l))
+   (else (intersect (car l) (intersectall (cdr l))))))
+
+(define (a-pair? x)
+  (cond
+   ((atom? x) #f)
+   ((null? x) #f)
+   ((null? (cdr x)) #f)
+   ((null? (cdr (cdr x))) #t)
+   (else #f)))
+
+(define (first p)
+  (car p))
+
+(define (second p)
+  (car (cdr p)))
+
+(define (third p)
+  (car (cdr (cdr p))))
+
+(define (build s1 s2)
+  (cons s1 (cons s2 '())))
+
+(define (fun? rel)
+  (set? (firsts rel)))
+
+(define (revrel rel)
+  (cond
+   ((null? rel) '())
+   (else
+    (cons
+     (build (second (car rel)) (first (car rel)))
+     (revrel (cdr rel))))))
+
 
 (atom? 'a)
 (atom? '())
