@@ -193,6 +193,43 @@
    (else (or (member* a (car l))
              (member* a (cdr l))))))
 
+
+(define (eqlist? l1 l2)
+  (cond
+   ((and (null? l1) (null? l2)) #t)
+   ((and (null? l1) (atom? (car l2))) #f)
+   ((null? l1) #f)))
+
+
+(define (numbered? a)
+  (cond
+   ((atom? a) (number? a))
+   (else
+    (and (numbered? (car a))
+         (numbered? (car (cdr (cdr a))))))))
+
+(define (value exp)
+  (cond
+   ((atom? exp) exp)
+   ((eq? (car (cdr exp)) '+)
+    (+ (value (car exp)) (value (car (cdr (cdr exp))))))
+   ((eq? (car (cdr exp)) 'x)
+    (* (value (car exp)) (value (car (cdr (cdr exp))))))))
+
+(define (sero? n)
+  (null? n))
+
+(define (edd1 n)
+  (cons '() n))
+
+(define (set? lat)
+  (cond
+   ((null? lat) #t)
+   (else
+    (cond
+     ((member? (car lat) (cdr lat)) #f)
+     (else (set? (cdr lat)))))))
+
 (atom? 'a)
 (atom? '())
 (atom? '(a b))
