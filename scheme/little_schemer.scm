@@ -303,6 +303,63 @@
      (build (second (car rel)) (first (car rel)))
      (revrel (cdr rel))))))
 
+(define (rember-f test? a l)
+  (cond
+   ((null? l) '())
+   (else
+    (cond
+     ((test? (car l) a) (cdr l))
+     (else
+      (cons (car l) (rember-f test? a (cdr l))))))))
+
+(define (rember-f test?)
+  (lambda (a l)
+    (cond
+     ((null? l) '())
+     ((test? (car l) a) (cdr l))
+     (else
+      (cons (car l) ((rember-f test?) a (cdr l)))))))
+
+
+(define (insertL-f test?)
+  (lambda (new old l)
+    (cond
+     ((null? l) '())
+     ((test? (car l) old)
+      (cons new (cons old (cdr l))))
+     (else
+      (cons (car l) ((insertL-f test?) new old (cdr l)))))))
+
+(define (insertR-f test?)
+  (lambda (new old l)
+    (cond 
+     ((null? l) '())
+     ((test? (car l) old)
+      (cons old (cons new (cdr l))))
+     (else
+      (cons (car l) ((insertR-f test?) new old (cdr l)))))))
+
+(define (left new old l)
+  (cons new (cons old (cdr l))))
+
+(define (right new old l)
+  (cons old (cons new (cdr l))))
+
+(define (insert-g test? side)
+  (lambda (new old l)
+    (cond
+     ((null? l) '())
+     ((test? (car l) old)
+      (side new old l))
+     (else
+      (cons (car l) ((insert-g test? side) new old (cdr l)))))))
+
+
+((insertL-f equal? ) 'a 'b '(b c d e f))
+((insertR-f equal? ) 'a 'b '(b c d e f))
+
+((insert-g equal? left) 'a 'b '(b c d e f))
+((insert-g equal? right) 'a 'b '(b c d e f))
 
 (atom? 'a)
 (atom? '())
