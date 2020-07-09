@@ -350,13 +350,18 @@
     (cond
      ((null? l) '())
      ((test? (car l) old)
-      (side new old l))
+      (side new old (cdr l)))
      (else
       (cons (car l) ((insert-g test? side) new old (cdr l)))))))
 
 
+(define (rember-new a l)
+  ((insert-g equal? (lambda (new old l) l)) #f a l))
+
 ((insertL-f equal? ) 'a 'b '(b c d e f))
 ((insertR-f equal? ) 'a 'b '(b c d e f))
+
+(rember-new 'b '(a b c d))
 
 ((insert-g equal? left) 'a 'b '(b c d e f))
 ((insert-g equal? right) 'a 'b '(b c d e f))
