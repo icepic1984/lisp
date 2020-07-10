@@ -437,6 +437,84 @@
 (define (a-friend x y)
   (length y))
 
+(define (keep-looking a sorn lat)
+  (cond
+   ((number? sorn) (keep-looking a (pick sorn lat) lat))
+   (else
+    (eq? sorn a))))
+
+
+(define (eternity x)
+  eternity x)
+
+(((lambda (length)
+    (lambda (l)
+      (cond
+       ((null? l) 0)
+       (else (add1 (length (cdr l)))))))
+  ((lambda (length)
+     (lambda (l)
+       (cond
+        ((null? l) 0)
+        (else
+         (add1 (length (cdr l))))))) eternity)) '(2))
+
+(((lambda (mk-length)
+    (mk-length (mk-length (mk-length eternity))))
+  (lambda (length)
+    (lambda (l)
+      (cond
+       ((null? l) 0)
+       (else (add1 (length (cdr l)))))))) '(2 3))
+
+
+(((lambda (mk-length)
+    (mk-length mk-length))
+  (lambda (length)
+    (lambda (l)
+      (cond
+       ((null? l) 0)
+       (else
+        (add1 (length (cdr l)))))))) '())
+
+(((lambda (mk-length)
+    (mk-length mk-length))
+  (lambda (mk-length)
+    (lambda (l)
+      (cond
+       ((null? l) 0)
+       (else (add1 ((mk-length mk-length) (cdr l)))))))) '(3 2))
+
+
+(((lambda (mk-length)
+    (mk-length mk-length))
+  (lambda (mk-length)
+    ((lambda (length)
+       (lambda (l)
+         (cond
+          ((null? l) 0)
+          (else (add1 (length (cdr l)))))))
+     (lambda (x)
+       ((mk-length mk-length) x))))) '(d d))
+
+
+(define Y
+  (lambda (le)
+    ((lambda (f) (f f))
+     (lambda (f)
+       (le (lambda (x) ((f f) x)))))))
+
+((Y (lambda (length)
+      (lambda (l)
+        (cond
+         ((null? l ) 0)
+         (else (add1 (length (cdr l)))))))) '(a b))
+
+
+
+
+(keep-looking 'test 0 '(1 2 3 test))
+
 (multiremberCo 'tuna '(straberries tuna and swordfisch) a-friend)
 
 (multiremberCo 'tuna '(tuna) a-friend)
