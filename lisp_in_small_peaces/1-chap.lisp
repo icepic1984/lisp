@@ -85,13 +85,6 @@
             (evlis (cdr exps) env))))
 
 
-(defun bla (form)
-  (case (car form)
-    ((if) (cadr form))
-    ((quoute (car (cdr form))))
-    (lambda (cadr form))
-    (otherwise 3)))
-
 (defparameter *global-environment*
   *initial-environment*)
 
@@ -114,7 +107,8 @@
   (defprimitive cons cons 2)
   (defprimitive car car 1)
   (defprimitive rplacd rplacd 2)
-  (defprimitive eq eq 2))
+  (defprimitive eq eq 2)
+  (defprimitive list list 2))
 
 (progn
   (defprimitive + + 2)
@@ -140,5 +134,14 @@
 (invoke  (evaluate '(lambda (x) (if x 10 20)) *global-environment*) '(nil))
 
 (evaluate '(if t 2 3) *global-environment*)
+
+(evaluate '(quote e) *global-environment*)
+
+(evaluate '(list 1 2) *global-environment* )
+
+(evaluate '((lambda (a)
+              ((lambda (b)
+                 (list a b))
+               (+ 2 a))) 1) *global-environment*)
 
 (truep (evaluate nil *initial-environment*))
